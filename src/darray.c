@@ -28,17 +28,24 @@ error:
 
 void darray_destroy(darray *array)
 {
+	debug("Destroying darray.");
+
 	int i;
 
-	for (i = 0; i < array->size; i++)
+	for (i = 0; i < darray_get_end(array); i++)
 		if (array->contents[i])
 			free(array->contents[i]);
 
+	free(array->contents);
 	free(array);
+
+	debug("Done destroying darray.");
 }
 
 int darray_resize(darray *array, size_t newsize)
 {
+	debug("Resize array to size %lu", newsize);
+
 	check(array, "Array is not well-defined.");
 	check(newsize >= 0, "Newsize should be non-negative, but has value %lu",
 		newsize);
@@ -49,21 +56,27 @@ int darray_resize(darray *array, size_t newsize)
 	array->size = newsize;
 	array->contents = contents;
 
+	debug("Done resizing array!");
 	return 0;
 error:
+	debug("Failed to resize array!");
+	free(contents);
 	return -1;
 }
 
 int darray_expand(darray *array)
 {
+	debug("Expand array.");
 	check(array, "Array is not well-defined.");
 	
 	int ret = darray_resize(array, 
 		darray_get_size(array) + darray_get_expand_rate(array));
 	check(ret == 0, "Failed to expand array to new size.");
 
+	debug("Done expanding array!");
 	return 0;
 error:
+	debug("Failed to expand array!");
 	return -1;
 }
 
@@ -86,9 +99,9 @@ error:
 int darray_set(darray *array, size_t i, void *elm)
 {
 	check(array, "Array is not well-defined.");
-	check(0 <= i && i <= darray_get_end(array), 
+	check(0 <= i && i <= darray_get_size(array), 
 		"Darray list index (%lu) is out of range [0:%lu]", 
-		i, darray_get_end(array));
+		i, darray_get_size(array));
 
 	array->contents[i] = elm;
 	array->end = i > array->end ? i : array->end;
@@ -112,18 +125,23 @@ error:
 
 void *darray_remove(darray *array, size_t i)
 {
+	debug("darray_remove: start darray_remove.");
+
 	check(array, "Darray is not well-defined.");
 	check(0 <= i && i <= array->end, 
 		"Darray list index (%lu) is out of range [0:%lu]", i, array->end)
 	
 	void *elm = array->contents[i];
-	array->contents[i] == NULL;
+	//array->contents[i] == NULL;
 
-	if (i == array->end - 1)
+	debug("darray_remove: array->end is %lu and index %lu", array->end, i);
+	if (i == array->end)
 		array->end--;
 
+	debug("darray_remove: succes.");
 	return elm;
 error:
+	debug("darray_remove: failure.");
 	return NULL;
 }
 
@@ -159,9 +177,10 @@ int darray_push(darray *array, void *elm)
 	check(array, "Darray is not well-defined.");
 	
 	int ret;
-	if (darray_get_size(array) == darray_get_end(array))
+	if (darray_get_size(array) == darray_get_end(array)) {
 		ret = darray_expand(array);
-	check(ret == 0, "Cannot push element on array.");
+		check(ret == 0, "Cannot push element on array.");
+	}
 
 	array->contents[array->end] = elm;
 	array->end++;
@@ -175,8 +194,7 @@ void *darray_pop(darray *array)
 {
 	check(darray_get_end(array) > 0, "Cannot pop an empty list.");
 
-	void *elm = darray_remove(array, array->end - 1);
-	array->end--;
+	void *elm = darray_remove(array, array->end);
 
 	if (darray_get_end(array) > darray_get_expand_rate(array)
 		&& darray_get_end(array) % darray_get_expand_rate(array)) 
