@@ -13,6 +13,7 @@
 
 #define mu_assert(test, message) 				\
 { 								\
+	tests_run++;						\
 	if (!(test)) {						\
 		printf("FAILED: %s\n", message);		\
 		tests_failures++;				\
@@ -25,7 +26,6 @@
 {								\
 	printf("TESTING %s\n", #test); 				\
 	test();							\
-	tests_run++; 						\
 }
 
 #define RUN_TESTS(name) 					\
