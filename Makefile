@@ -17,8 +17,10 @@ all:
 test:
 	cc tests/test_darray.c $(CFLAGS) -I $(SOURCES) -Lbuild -ldarray -o bin/test_darray
 	cc tests/test_structure.c $(CFLAGS) -I $(SOURCES) -Lbuild -ldarray -lstructure -o bin/test_structure
+	cc tests/test_dllist.c $(CFLAGS) -I $(SOURCES) -Lbuild -ldllist -o bin/test_dllist
 	bin/test_darray
 	bin/test_structure
+	bin/test_dllist
 
 clean:
 	rm -rf bin

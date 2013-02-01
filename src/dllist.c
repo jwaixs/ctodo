@@ -24,6 +24,7 @@ error:
 
 void dllist_destroy(dllist *list)
 {
+	debug("dllist_destroy: start destroying list.");
 	check(list != NULL, "dllist_destroy: list should not be NULL.");
 
 	dllist_foreach (list, cur)
@@ -32,16 +33,19 @@ void dllist_destroy(dllist *list)
 
 	free(list->last);
 	free(list);
+	debug("dllist_destory: done destorying list.");
 error:
 	return;
 }
 
 void dllist_clear(dllist *list)
 {
+	debug("dllist_clear: start clearing list.");
 	check(list != NULL, "dllist_clear: list should not be NULL.");
 
 	dllist_foreach (list, cur)
 		free(cur->value);
+	debug("dllist_clear: done clearing list.");
 error:
 	return;
 }
@@ -118,7 +122,8 @@ void *dllist_get_first(dllist *list)
 {
 	check(list != NULL, "dllist_get_first: list should not be NULL.");
 
-	return list->first;
+	if (list->first)
+		return list->first->value;
 error:
 	return NULL;
 }
@@ -127,7 +132,8 @@ void *dllist_get_last(dllist *list)
 {
 	check(list != NULL, "dllist_get_last: list should not be NULL.");
 
-	return list->last;
+	if (list->last)
+		return list->last->value;
 error:
 	return NULL;
 }
